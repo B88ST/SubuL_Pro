@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة سُبل | لإدارة عيادات ومراكز طب الأسنان</title>
+    <meta name="description" content="نظام متكامل لإدارة عيادات ومراكز طب الأسنان - منصة سبل">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css?v=11.2">
+</head>
+<body class="dark-mode">
+    <!-- Background glows -->
+    <div class="glow-point-1"></div>
+    <div class="glow-point-2"></div>
+
+    <!-- ========================================== -->
+    <!-- 1. LOGIN SCREEN OVERLAY (بوابة تسجيل الدخول) -->
+    <!-- ========================================== -->
+    <div class="login-overlay" id="loginOverlay">
+        <canvas id="loginCanvasBg"></canvas>
+        
+        <div class="login-wrapper">
+            <!-- Left panel: Platform info & developer contact -->
+            <div class="login-info-panel glass-card font-arabic">
+                <h2>منصة سُبل لطب الأسنان</h2>
+                <hr class="form-divider" style="margin: 10px 0 15px 0;">
+                <p style="line-height: 1.7; font-size: 13.5px; color: #cbd5e1; margin-bottom: 20px; text-align: justify; direction: rtl;">
+                    مرحباً بكم في منصة سُبل المتكاملة لإدارة وعيادات طب الأسنان. يقدم النظام حلاً برمجياً متطوراً لإدارة ملفات المرضى وتاريخهم المرضي، وجدول المواعيد الذكي مع تنبيهات تلقائية، بالإضافة إلى مخطط فك الأسنان التفاعلي الحديث والتحليلات المالية والتدفقات النقدية اليومية بدقة فائقة.
+                </p>
+                <div class="dev-contact-card" style="background: rgba(0, 0, 0, 0.25); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); direction: rtl; text-align: right; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-weight: 700; color: var(--accent-emerald); font-size: 13px;"><i class="fa-solid fa-code"></i> البرمجة والتطوير:</div>
+                    <div style="font-weight: 800; font-size: 15px; color: #fff; margin-bottom: 8px;">محمد يوسف اسعد</div>
+                    
+                    <div style="font-weight: 700; color: var(--accent-blue); font-size: 13px;"><i class="fa-solid fa-phone"></i> للتواصل والدعم الفني:</div>
+                    <div style="font-weight: 800; font-size: 15px; color: #fff;"><a href="tel:07855906001" style="color: #fff; text-decoration: none;">07855906001</a></div>
+                </div>
+            </div>
+
+            <!-- Right panel: Login Card -->
+            <div class="login-card glass-card">
+                <div class="login-logo-area">
+                    <img src="assets/logo.jpg" alt="سُبل" class="login-logo-img">
+                    <h2>مـنـصـة سُــبـل</h2>
+                    <p>إدارة عيادات ومراكز طب الأسنان المتكاملة</p>
+                </div>
+                
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="loginUser"><i class="fa-solid fa-user-shield"></i> اسم المستخدم / الحساب</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم..." autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPass"><i class="fa-solid fa-lock"></i> كلمة المرور</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPass" placeholder="••••••••">
+                            <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility()">
+                                <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="login-error-msg hidden" id="loginError">
+                        <i class="fa-solid fa-triangle-exclamation"></i> خطأ: اسم المستخدم أو كلمة المرور غير صحيحة!
+                    </div>
+                    
+                    <button class="btn btn-primary btn-login" onclick="handleLoginSubmit()">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> تسجيل الدخول الآمن
+                    </button>
+                </div>
+                
+                <div class="login-footer">
+                    <span>تطوير منصة سُبل © 2026 - نظام أمان مشفر</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN APPLICATION CONTAINER (النظام الأساسي) -->
+    <!-- ========================================== -->
+    <div class="app-container hidden" id="appContainer" style="width: 100% !important; max-width: 100vw !important; overflow: hidden !important; min-height: 100vh;">
+        
+        <!-- Sidebar Navigation (الشريط الجانبي الأيمن - مطابقة لصورة 5) -->
+        <aside class="sidebar" id="sidebar" style="width: 270px !important; min-width: 270px !important; flex-shrink: 0 !important; display: flex !important; flex-direction: column !important; z-index: 100 !important;">
+            <div class="sidebar-header">
+                <img src="assets/logo.jpg" alt="Logo" class="app-logo" id="sidebarClinicLogo">
+                <div class="logo-text">
+                    <h3 id="sidebarClinicName">منصة سبل</h3>
+                    <h3 id="sidebarClinicNameSub">لإدارة العيادات</h3>
+                    <span>نظام الإدارة المتكامل</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-tab="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>لوحة التحكم</span>
+                    </li>
+                    <li class="nav-item" data-tab="patients">
+                        <i class="fa-solid fa-users"></i>
+                        <span>إدارة المرضى</span>
+                    </li>
+                    <li class="nav-item" data-tab="medical-file">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <span>الملف الطبي</span>
+                    </li>
+                    <li class="nav-item" data-tab="appointments">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>المواعيد والتقويم</span>
+                    </li>
+                    <li class="nav-item" data-tab="dental-chart">
+                        <i class="fa-solid fa-tooth"></i>
+                        <span>مخطط الأسنان</span>
+                    </li>
+                    <li class="nav-item" data-tab="billing">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>الحسابات والأقساط</span>
+                    </li>
+                    <li class="nav-item owner-only" data-tab="financial-audit" id="nav-owner-audit">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <span>جرد الحسابات</span>
+                    </li>
+                    <li class="nav-item" data-tab="inventory">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>المخزن والأجهزة</span>
+                    </li>
+                    <li class="nav-item" data-tab="staff">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span>الموظفون والصلاحيات</span>
+                    </li>
+                    <li class="nav-item" data-tab="settings">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>الإعدادات العامة</span>
+                    </li>
+                    <li class="nav-item owner-only" data-tab="subscriber-clinics" id="nav-owner-clinics">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span>عيادات المشتركين</span>
+                    </li>
+                    <li class="nav-item owner-only" data-tab="database-manager" id="nav-owner-db">
+                        <i class="fa-solid fa-database"></i>
+                        <span>مدير قواعد البيانات</span>
+                    </li>
+                    <li class="nav-item owner-only" data-tab="accounts-manager" id="nav-owner-accounts">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>حسابات المنصة والصلاحيات</span>
+                    </li>
+                    <li class="nav-item" data-tab="support">
+                        <i class="fa-solid fa-headset"></i>
+                        <span>الحساب والدعم الفني</span>
+                    </li>
+                    <li class="nav-item" data-tab="profile">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span>الملف الشخصي</span>
+                    </li>
+                    <li class="nav-item" data-tab="system-info">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>معلومات النظام</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Database Controls section in Sidebar -->
+            <div class="sidebar-db-section">
+                <span class="db-active-label">ملف قاعدة البيانات النشط: <br><strong class="green-text" id="activeDbName">(متزامن) json محمد</strong></span>
+            </div>
+            
+            <!-- Sidebar Footer profile and action buttons -->
+            <div class="sidebar-footer">
+                <div class="footer-icons-row">
+                    <button class="footer-icon-btn text-danger" onclick="lockSystem()" title="قفل الشاشة">
+                        <i class="fa-solid fa-lock"></i>
+                    </button>
+                    <button class="footer-icon-btn text-warning" onclick="handleLogout()" title="تسجيل الخروج">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+                <div class="logged-user-info">
+                    <h4 id="loggedUserName">محمد يوسف اسعد</h4>
+                    <span id="loggedUserRole">مشرف العيادة (Admin)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" style="flex-grow: 1 !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; min-height: 100vh !important; overflow-y: auto !important;">
+            
+            <!-- Active Clinic View Banner for Platform Owner -->
+            <div id="platformOwnerViewBanner" class="hidden" style="background: linear-gradient(135deg, #1e1b4b, #311042); border-bottom: 2px solid #ef4444; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; color: #fff; font-size: 13px; z-index: 999; font-family: 'Cairo';">
+                <div>
+                    <i class="fa-solid fa-triangle-exclamation text-warning" style="margin-left: 8px;"></i>
+                    <span>أنت تتصفح حالياً قاعدة بيانات العيادة المشتركة: </span>
+                    <strong id="activeViewClinicName" style="color: #ef4444; font-weight: 800;">-</strong>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="returnToPrimaryDatabase()" style="padding: 4px 10px; font-size: 11px;">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> العودة للعيادة الرئيسية
+                </button>
+            </div>
+            
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left" style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                    <h2 id="currentPageTitle" style="margin:0;">لوحة التحكم والمؤشرات العامة</h2>
+                    <div id="headerAppointmentAlert" class="header-apt-alert-badge hidden"></div>
+                </div>
+                <div class="header-right">
+                    <!-- Notifications -->
+                    <div class="header-action-wrapper" id="notiWrapper">
+                        <button class="header-icon-btn" id="notiBtn" title="الإشعارات">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notification-badge" id="notiBadgeCount">0</span>
+                        </button>
+                        <div class="noti-dropdown glass-card hidden" id="notiDropdown">
+                            <div class="noti-dropdown-header">
+                                <h4>الإشعارات والتنبيهات</h4>
+                                <button onclick="clearAllNotifications()">مسح الكل</button>
+                            </div>
+                            <div class="noti-list" id="notiList">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button class="header-icon-btn" id="themeToggleBtn" title="تغيير المظهر">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    
+                    <!-- Dynamic Date Badge -->
+                    <div class="date-badge-top" id="topDateBadge">2026-07-21</div>
+                </div>
+            </header>
+            
+            <!-- Dynamic Content Viewports -->
+            <div class="content-viewport">
+                
+                <!-- 1. DASHBOARD TAB -->
+                <section class="tab-pane active" id="tab-dashboard">
+                    <div class="stats-cards-grid">
+                        <div class="stat-card glass-card blue">
+                            <div class="icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="info">
+                                <span>إجمالي المرضى</span>
+                                <h3 id="dash-total-patients">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card orange">
+                            <div class="icon"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="info">
+                                <span>إجمالي المقبوضات</span>
+                                <h3 id="dash-total-received">0 د.ع</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card green">
+                            <div class="icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="info">
+                                <span>حجوزات اليوم</span>
+                                <h3 id="dash-today-bookings">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card red">
+                            <div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="info">
+                                <span>نواقص المخزن</span>
+                                <h3 id="dash-low-stock">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-columns-row">
+                        <!-- Left column: urgent appointments -->
+                        <div class="dashboard-panel glass-card appointments-panel">
+                            <h3>المواعيد العاجلة لليوم</h3>
+                            <div class="appointment-scrollable" id="dashAppointmentsList">
+                                <div class="no-appointments-msg">لا توجد مواعيد عاجلة مسجلة لليوم.</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right column: audit logs -->
+                        <div class="dashboard-panel glass-card logs-panel">
+                            <h3>آخر سجلات العمليات والأمان (Audit Trail)</h3>
+                            <div class="log-scrollable" id="dashLogsList">
+                                <!-- Dynamic styled log blocks -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 1.2 PERSONAL PROFILE TAB (NEW) -->
+                <!-- 1.2 PERSONAL PROFILE TAB -->
+                <section class="tab-pane" id="tab-profile">
+                    <div class="profile-container font-arabic" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Profile Header Card -->
+                        <div class="profile-header-card glass-card" style="position: relative; overflow: hidden; border-radius: 12px; padding: 25px; display: flex; align-items: center; gap: 20px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid var(--border-color);">
+                            <div class="profile-avatar-wrapper" style="position: relative; display: inline-block;">
+                                <div class="profile-avatar" style="width: 70px; height: 70px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                </div>
+                                <span class="profile-status-dot" style="position: absolute; bottom: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 2.5px solid #0f172a;"></span>
+                            </div>
+                            <div class="profile-user-meta">
+                                <h2 id="profile-lbl-owner-name-header" style="margin: 0 0 8px 0; font-size: 20px; font-weight: 800; color: #fff;">اسم المستخدم</h2>
+                                <div class="profile-badges" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <span class="profile-badge badge-role" id="profile-lbl-role-badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;">OWNER</span>
+                                    <span class="profile-badge badge-clinic" id="profile-lbl-clinic-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;">اسم العيادة</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Centered Single Card: Details and Inline Editing -->
+                        <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+                            <div class="profile-card glass-card" style="padding: 25px; border-radius: 12px; background: rgba(30, 41, 59, 0.45); border: 1px solid var(--border-color);">
+                                <div class="card-header-clean" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                                    <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f3f4f6;"><i class="fa-solid fa-id-card" style="color:var(--accent-blue); margin-left: 8px;"></i> معلومات الحساب والترخيص</h3>
+                                    
+                                    <!-- Edit Profile Controls (Owner Only) -->
+                                    <div id="profile-edit-controls" style="display: none; gap: 8px; align-items: center;">
+                                        <button id="btn-edit-profile" class="btn btn-secondary btn-sm" onclick="enableProfileEditMode()" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 12px; font-size: 11px; border-radius: 6px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                            <i class="fa-solid fa-user-pen"></i> تعديل البيانات
+                                        </button>
+                                        <div id="profile-save-cancel-btns" style="display: none; gap: 8px; align-items: center;">
+                                            <button class="btn btn-primary btn-sm" onclick="savePersonalProfileInfo()" style="background: var(--grad-emerald); padding: 5px 12px; font-size: 11px; border-radius: 6px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                                <i class="fa-solid fa-check"></i> حفظ
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="disableProfileEditMode()" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 5px 12px; font-size: 11px; border-radius: 6px; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                                <i class="fa-solid fa-xmark"></i> إلغاء
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-details-list" style="display: flex; flex-direction: column; gap: 16px;">
+                                    <!-- Username -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-user"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">اسم المستخدم للدخول</span>
+                                            <strong id="profile-lbl-user" class="profile-view-mode" style="font-size: 13.5px; color: #f3f4f6;">--</strong>
+                                            <input type="text" id="editProfileUsername" class="profile-edit-mode hidden" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Full Name -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-signature"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">الاسم الكامل للمشرف</span>
+                                            <strong id="profile-lbl-owner" class="profile-view-mode" style="font-size: 13.5px; color: #f3f4f6;">--</strong>
+                                            <input type="text" id="editProfileFullName" class="profile-edit-mode hidden" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Clinic Name -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-clinic-medical"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">العيادة الطبية المخصصة</span>
+                                            <strong id="profile-lbl-clinic" class="profile-view-mode text-emerald" style="font-size: 13.5px; color: #10b981;">--</strong>
+                                            <input type="text" id="editProfileClinicName" class="profile-edit-mode hidden" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Password -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-key"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">كلمة المرور</span>
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <strong id="profile-lbl-pass" class="profile-view-mode" style="-webkit-text-security: disc; text-security: disc; font-size: 13.5px; color: #f3f4f6;">--</strong>
+                                                <button class="btn btn-secondary btn-sm profile-view-mode" onclick="toggleProfilePasswordVisibility()" style="padding: 2px 6px; font-size: 9px; line-height: 1;" title="عرض كلمة المرور">
+                                                    <i class="fa-solid fa-eye" id="profilePassEyeIcon"></i>
+                                                </button>
+                                            </div>
+                                            <input type="password" id="editProfilePassword" class="profile-edit-mode hidden" placeholder="أدخل كلمة مرور جديدة أو اتركها فارغة..." style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Role -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-user-shield"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">رتبة وصلاحية الحساب</span>
+                                            <strong id="profile-lbl-role" class="profile-view-mode text-blue" style="font-size: 13.5px; color: #3b82f6;">--</strong>
+                                            <select id="editProfileRole" class="profile-edit-mode hidden" style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; outline: none; cursor: pointer; width: 100%; margin-top: 4px;">
+                                                <option value="OWNER">مشرف مالك (Owner)</option>
+                                                <option value="ADMIN">مشرف عيادة (Admin)</option>
+                                                <option value="DOCTOR">طبيب معالج (Doctor)</option>
+                                                <option value="STAFF">موظف عادي (Staff)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Active Status -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-shield-halved"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">حالة تفعيل الحساب</span>
+                                            <strong class="text-emerald" style="font-size: 13.5px; color: #10b981;"><i class="fa-solid fa-circle-check"></i> نشط ومفعل حالياً</strong>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- License Type -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-file-contract"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">نوع ترخيص المنصة</span>
+                                            <strong id="profile-lbl-license-type" class="profile-view-mode" style="color:var(--accent-orange); font-size: 13.5px;">--</strong>
+                                            <input type="text" id="editProfileLicenseType" class="profile-edit-mode hidden" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- License Date -->
+                                    <div class="profile-detail-item" style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="item-icon" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"><i class="fa-solid fa-calendar-check"></i></div>
+                                        <div class="item-content" style="display: flex; flex-direction: column; flex-grow: 1;">
+                                            <span style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">تاريخ الترخيص والمباشرة</span>
+                                            <strong id="profile-lbl-license-date" class="profile-view-mode" style="font-size: 13.5px; color: #f3f4f6;">--</strong>
+                                            <input type="date" id="editProfileLicenseDate" class="profile-edit-mode hidden" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12.5px; width: 100%; margin-top: 4px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 1.25 PLATFORM ACCOUNTS MANAGER TAB (OWNER ONLY) -->
+                <section class="tab-pane owner-only" id="tab-accounts-manager">
+                    <div class="accounts-container font-arabic" style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+                        
+                        <div class="accounts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; align-items: start;">
+                            
+                            <!-- Right Column: Create Account Form -->
+                            <div class="settings-panel-box glass-card" style="padding: 20px; border-radius: 12px; background: rgba(30, 41, 59, 0.45); border: 1px solid var(--border-color);">
+                                <h3 style="margin: 0 0 15px 0; font-size: 15px; font-weight: 700; color: #f3f4f6;"><i class="fa-solid fa-user-plus" style="color:var(--accent-emerald);"></i> إنشاء حساب موظف جديد</h3>
+                                <hr class="form-divider" style="border: none; border-top: 1px solid var(--border-color); margin: 0 0 15px 0;">
+                                
+                                <div class="edit-profile-form" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div style="display:flex; gap:10px;">
+                                        <div class="form-group-clean" style="flex:1; display: flex; flex-direction: column; gap: 6px;">
+                                            <label for="newAccUser" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">اسم المستخدم للدخول</label>
+                                            <input type="text" id="newAccUser" placeholder="مثال: ali.dentist" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                                        </div>
+                                        <div class="form-group-clean" style="flex:1; display: flex; flex-direction: column; gap: 6px;">
+                                            <label for="newAccPass" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">كلمة المرور</label>
+                                            <input type="password" id="newAccPass" placeholder="أدخل كلمة المرور..." style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display:flex; gap:10px;">
+                                        <div class="form-group-clean" style="flex:1; display: flex; flex-direction: column; gap: 6px;">
+                                            <label for="newAccClinic" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">اسم العيادة</label>
+                                            <input type="text" id="newAccClinic" placeholder="مثال: عيادة النخبة" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                                        </div>
+                                        <div class="form-group-clean" style="flex:1; display: flex; flex-direction: column; gap: 6px;">
+                                            <label for="newAccOwnerName" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">الاسم الكامل للموظف</label>
+                                            <input type="text" id="newAccOwnerName" placeholder="الاسم الكامل..." style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group-clean" style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="newAccRole" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">صلاحيات ونوع الحساب</label>
+                                        <select id="newAccRole" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px; outline: none; cursor: pointer;">
+                                            <option value="STAFF">موظف عادي (مستقبل/محاسب)</option>
+                                            <option value="ADMIN">مشرف عيادة (ADMIN)</option>
+                                            <option value="OWNER">مشرف مالك (OWNER)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group-clean mt-2">
+                                        <label style="font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 12px; font-size:12px;"><i class="fa-solid fa-user-lock" style="color:var(--accent-orange);"></i> تحديد الصفحات واللوحات المحظورة عن الحساب (الأحمر محظور / الأخضر مسموح):</label>
+                                        
+                                        <!-- Permissions Switch Box with custom scroll -->
+                                        <div class="permissions-toggle-container" style="display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.25); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); max-height: 280px; overflow-y: auto;">
+                                            
+                                            <!-- Dashboard Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">لوحة التحكم والمؤشرات (Dashboard)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر وحجب شاشة الإحصائيات العامة</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictDashboard">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+                                            
+                                            <!-- Patients Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">إدارة المرضى والسجلات (Patients)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر الدخول لسجلات المرضى وملفاتهم الشخصية</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictPatients">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Medical File Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">الملف الطبي الموحد (Medical File)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر تعديل أو رؤية الفحوصات والروشتات والتشخيص الطبي</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictMedicalFile">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Appointments Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">المواعيد والتقويم (Appointments)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر شاشة حجز وتعديل المواعيد والتقويم</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictAppointments">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Dental Chart Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">مخطط الأسنان التفاعلي (Dental Chart)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر فحص وعرض مجسم الأسنان الـ32 للمراجع</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictDentalChart">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Billing Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">الحسابات والأقساط والمدفوعات (Billing)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر الفواتير وتسجيل المدفوعات والديون والأقساط</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictBilling">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Financial Audit Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">جرد الحسابات والأرباح (Financial Audit)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر شاشة الإيرادات والأرباح والمصروفات بالكامل</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictAudit">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Inventory Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">المخزن وجرد الأجهزة (Inventory)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر شاشة المواد الاستهلاكية وتتبع أجهزة العيادة</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictInventory">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Staff Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">الموظفون وتسجيل الحضور (Staff & Attendance)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر شاشة كادر العمل وتسجيل الحضور والرواتب</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictStaff">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Settings Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">الإعدادات العامة للعيادة (General Settings)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر تعديل أوقات العمل وقوالب طباعة التقارير</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictSettings">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Clinics Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">لوحة عيادات المشتركين والفروع (Clinics)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر إدارة وتعديل تراخيص الفروع والاشتراكات</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictClinics">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Database Manager Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">أدوات ومدير قواعد البيانات (Database Manager)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر عمليات استيراد/تصدير البيانات والنسخ الاحتياطي</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictDb">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Accounts Manager Tab -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">إدارة حسابات المنصة والصلاحيات (Accounts Manager)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر وإخفاء تبويب إدارة الحسابات والصلاحيات بالكامل</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictAccountsManagerTab">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                            <!-- Create Account Action -->
+                                            <div class="perm-toggle-row" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0;">
+                                                <div class="perm-info" style="display:flex; flex-direction:column; text-align:right;">
+                                                    <span class="perm-title" style="font-size: 12px; font-weight: 700; color: #fff;">صلاحية تسجيل مستخدمين جدد (Create Account)</span>
+                                                    <span class="perm-desc" style="font-size: 9.5px; color: var(--text-muted);">حظر قدرة المستخدم على الضغط على زر إنشاء حسابات جديدة</span>
+                                                </div>
+                                                <label class="switch-toggle-btn">
+                                                    <input type="checkbox" id="restrictCreateAccount">
+                                                    <span class="slider-toggle-round"></span>
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary btn-block mt-3" onclick="submitCreateUserAccount()" style="background: var(--grad-emerald); width: 100%; justify-content: center; display: flex; gap: 8px; align-items: center; padding: 10px; font-size: 13px; font-weight: 700; border-radius: 8px;">
+                                        <i class="fa-solid fa-user-plus"></i> إنشاء وتفعيل حساب المستخدم
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Left Column: Active Accounts List -->
+                            <div class="settings-panel-box glass-card" style="padding: 20px; border-radius: 12px; background: rgba(30, 41, 59, 0.45); border: 1px solid var(--border-color);">
+                                <h3 style="margin: 0 0 15px 0; font-size: 15px; font-weight: 700; color: #f3f4f6;"><i class="fa-solid fa-users-gear" style="color:var(--accent-blue);"></i> الحسابات النشطة والصلاحيات الحالية</h3>
+                                <hr class="form-divider" style="border: none; border-top: 1px solid var(--border-color); margin: 0 0 15px 0;">
+                                
+                                <div class="table-responsive mt-3">
+                                    <table class="data-table" style="width:100%; border-collapse:collapse; text-align:right;">
+                                        <thead>
+                                            <tr style="border-bottom: 2px solid var(--border-color);">
+                                                <th style="padding: 8px; color:var(--text-muted); font-size:11.5px; font-weight:700;">المستخدم المشرف</th>
+                                                <th style="padding: 8px; color:var(--text-muted); font-size:11.5px; font-weight:700;">العيادة الطبية</th>
+                                                <th style="padding: 8px; color:var(--text-muted); font-size:11.5px; font-weight:700;">رتبة الحساب</th>
+                                                <th style="padding: 8px; color:var(--text-muted); font-size:11.5px; font-weight:700;">حالة الوصول والصلاحيات</th>
+                                                <th style="padding: 8px; color:var(--text-muted); font-size:11.5px; font-weight:700; text-align:center;">إجراءات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="activeUsersTableBody">
+                                            <!-- Loaded dynamically from app.js -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. PATIENTS TAB -->
+                <section class="tab-pane" id="tab-patients">
+                    <div class="control-row">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="patientSearchInput" placeholder="ابحث باسم المريض، رقم الهاتف، أو رقم الملف...">
+                        </div>
+                        <div class="button-group-row">
+                            <button class="btn btn-danger owner-only" onclick="clearAllPatients()" id="btn-clear-patients">
+                                <i class="fa-solid fa-trash-can"></i> حذف جميع المرضى
+                            </button>
+                            <button class="btn btn-primary" onclick="showAddPatientModal()">
+                                <i class="fa-solid fa-plus"></i> تسجيل مريض جديد
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card table-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>اسم المريض</th>
+                                        <th>رقم الملف</th>
+                                        <th>رقم الهاتف</th>
+                                        <th>الجنس</th>
+                                        <th>العمر</th>
+                                        <th>الجنسية</th>
+                                        <th>الطبيب المعالج</th>
+                                        <th>الجلسات المتبقية</th>
+                                        <th>المتبقي عليه</th>
+                                        <th>العمليات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patientsTableBody">
+                                    <!-- Dynamic row loaders -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. MEDICAL FILE TAB -->
+                <section class="tab-pane" id="tab-medical-file">
+                    <div class="medical-selection-bar">
+                        <label for="medicalPatientSelect">اختر ملف المريض:</label>
+                        <select id="medicalPatientSelect" onchange="loadMedicalProfileData()">
+                            <!-- Dynamic selector options -->
+                        </select>
+                    </div>
+                    
+                    <div class="medical-record-layout">
+                        <!-- Left column: Prescriptions list -->
+                        <div class="medical-record-box glass-card font-arabic">
+                            <div class="box-header-row">
+                                <h3>الوصفات الطبية الصادرة وسجل الأدوية</h3>
+                                <button class="btn btn-primary btn-sm" onclick="showAddPrescriptionModal()">+ إصدار وصفة طبية جديدة</button>
+                            </div>
+                            <div class="prescriptions-container" id="med-prescriptions-list">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Right column: Medical profile history -->
+                        <div class="medical-record-box glass-card font-arabic">
+                            <h3>التاريخ المرضي وتفاصيل الحالة التفصيلية</h3>
+                            <div class="patient-details-card">
+                                <div class="detail-line"><span>الاسم الكامل:</span><strong id="med-card-name">--</strong></div>
+                                <div class="detail-line"><span>العمر والجنسية:</span><strong id="med-card-age-nationality">--</strong></div>
+                                <div class="detail-line"><span>الطبيب المعالج للمريض:</span><strong id="med-card-doctor">--</strong></div>
+                                <div class="detail-line"><span>سعر العلاج / الجلسة:</span><strong id="med-card-price" class="text-emerald">--</strong></div>
+                                <div class="detail-line"><span>نوع الجلسة العلاجية:</span><strong id="med-card-type">--</strong></div>
+                            </div>
+                            
+                            <hr class="form-divider">
+                            
+                            <div class="edit-profile-form">
+                                <h4>تعديل وتحديث بيانات الملف المفتوح</h4>
+                                <div class="form-group">
+                                    <label for="medInputChronic">الأمراض المزمنة (إن وجدت)</label>
+                                    <input type="text" id="medInputChronic" value="لا">
+                                </div>
+                                <div class="form-group">
+                                    <label for="medInputAllergies">الحساسية والتحسس</label>
+                                    <input type="text" id="medInputAllergies" value="لا">
+                                </div>
+                                <div class="form-group">
+                                    <label for="medInputDone">شنو سوينه اله (الإجراء المنجز)</label>
+                                    <textarea id="medInputDone" rows="3" placeholder="مثال: جلسه اولى دفع 50000"></textarea>
+                                </div>
+                                <div class="form-group-row-2 mt-3">
+                                    <div class="form-group">
+                                        <label for="medInputSessions">الجلسات المتبقية</label>
+                                        <input type="number" id="medInputSessions" value="3">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="medInputDebt">المبلغ المتبقي عليه (د.ع)</label>
+                                        <input type="number" id="medInputDebt" value="100000">
+                                    </div>
+                                </div>
+                                <div class="form-buttons-row mt-3">
+                                    <button class="btn btn-primary" onclick="saveActiveMedicalProfile()">
+                                        <i class="fa-solid fa-save"></i> حفظ وتحديث الملف الطبي
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="printActiveMedicalProfile()">
+                                        <i class="fa-solid fa-print"></i> طباعة الملف الطبي
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- سجل الجلسات والإجراءات العلاجية المنفذة للمراجع (مطابق تماماً لصورة 4) -->
+                    <div class="glass-card p-4 mt-4 font-arabic">
+                        <div class="panel-header-row" style="flex-wrap: wrap; gap: 15px;">
+                            <h3 style="margin: 0;"><i class="fa-solid fa-clipboard-list"></i> سجل الجلسات والإجراءات العلاجية للمراجع</h3>
+                            <div class="button-group-row" style="flex-wrap: wrap; gap: 8px;">
+                                <button class="btn btn-danger owner-only btn-sm" onclick="clearAllSessions()" id="btn-clear-sessions">
+                                    <i class="fa-solid fa-trash-can"></i> مسح الجلسات
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="showAddPaymentModal(false)" style="background:var(--grad-emerald);">
+                                    <i class="fa-solid fa-money-bill-wave"></i> تسجيل واصل
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="showAddPaymentModal(true)" style="background:#8b5cf6;">
+                                    <i class="fa-solid fa-coins"></i> دفع المتبقي
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="showAddTreatmentSessionModal()" style="background:#007f7f;">
+                                    <i class="fa-solid fa-tooth"></i> تسجيل جلسة
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="printComprehensiveLedger()" style="background:#ffffff; color:#111827; border: 1px solid #d1d5db;">
+                                    <i class="fa-solid fa-receipt"></i> كشف شامل
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive mt-3">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ</th>
+                                        <th>الإجراء العلاجي</th>
+                                        <th>التكلفة الكلية</th>
+                                        <th>المدفوع نقداً</th>
+                                        <th>المتبقي عليه</th>
+                                        <th>ملاحظات الطبيب</th>
+                                        <th>خيارات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patientSessionsTableBody">
+                                    <!-- Dynamic rows loaded from app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. APPOINTMENTS TAB (المواعيد والتقويم المطور - واجهة تذاكر الحجز والفلترة الفاخرة) -->
+                <section class="tab-pane" id="tab-appointments">
+                    <div class="control-row">
+                        <div class="calendar-views">
+                            <button class="btn btn-switch active" onclick="switchCalendarView('daily')">عرض جدول اليوم</button>
+                            <button class="btn btn-switch" onclick="switchCalendarView('weekly')">عرض أسبوعي</button>
+                            <button class="btn btn-switch" onclick="switchCalendarView('monthly')">عرض شهري</button>
+                        </div>
+                        <div class="button-group-row">
+                            <button class="btn btn-danger owner-only" onclick="clearAllAppointments()" id="btn-clear-appointments">
+                                <i class="fa-solid fa-calendar-xmark"></i> إلغاء جميع الحجوزات
+                            </button>
+                            <button class="btn btn-secondary" onclick="printDailyAppointments()"><i class="fa-solid fa-print"></i> طباعة المواعيد</button>
+                            <button class="btn btn-primary" onclick="showAddAppointmentModal()">
+                                <i class="fa-solid fa-calendar-plus"></i> حجز موعد جديد
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-viewport">
+                        <!-- Daily Grid -->
+                        <div class="calendar-pane active" id="cal-view-daily">
+                            <div class="daily-layout">
+                                <div class="daily-list-card glass-card">
+                                    <div class="panel-header-row" style="border:none; margin-bottom:10px; padding:0;">
+                                        <h3>جدول زيارات وحجوزات اليوم</h3>
+                                        <span class="status-indicator success" id="dailyAptsCount" style="font-weight: 800;">0 مواعيد اليوم</span>
+                                    </div>
+                                    <div class="apts-list-grid" id="dailyAptsList">
+                                        <!-- Styled premium appointment tickets loaded from JS -->
+                                    </div>
+                                </div>
+                                <div class="daily-hours-card glass-card">
+                                    <h3>توزيع إشغال الغرف والوحدات السريرية بالعيادة</h3>
+                                    <div class="hours-grid" id="dailyHoursGrid">
+                                        <!-- Dynamic hourly status -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Weekly Grid -->
+                        <div class="calendar-pane" id="cal-view-weekly">
+                            <div class="weekly-grid-container glass-card" id="weeklyCalGrid">
+                                <!-- Dynamic week columns -->
+                            </div>
+                        </div>
+                        
+                        <!-- Monthly Grid -->
+                        <div class="calendar-pane" id="cal-view-monthly">
+                            <div class="monthly-grid-container glass-card">
+                                <div class="monthly-grid-header">
+                                    <span>الأحد</span><span>الإثنين</span><span>الثلاثاء</span><span>الأربعاء</span><span>الخميس</span><span>الجمعة</span><span>السبت</span>
+                                </div>
+                                <div class="monthly-grid-days" id="monthlyCalGridDays">
+                                    <!-- Dynamic 35 cells -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. DENTAL CHART & EDUCATION ATLAS TAB (مخطط الأسنان وأطلس الأسنان المطور) -->
+                <section class="tab-pane" id="tab-dental-chart">
+                    <div class="chart-header-controls">
+                        <div class="chart-view-switch">
+                            <button class="btn btn-chart-switch active" id="btnSwitchJaw" onclick="switchDentalView('jaw')">مخطط الفك التفاعلي</button>
+                            <button class="btn btn-chart-switch" id="btnSwitchAtlas" onclick="switchDentalView('atlas')">أطلس ودليل الأسنان التعليمي</button>
+                        </div>
+                        <h2>مخطط الأسنان وأطلس المراجع الطبية للعيادة</h2>
+                    </div>
+                    
+                    <!-- View A: Interactive Jaw Chart -->
+                    <div class="dental-view-pane active" id="dental-view-jaw">
+                        <div class="dental-chart-layout">
+                            <!-- Left panel: Tooth details edit -->
+                            <div class="chart-side-panel glass-card">
+                                <div id="toothEditNoSelection" class="no-selection-notice">
+                                    <i class="fa-solid fa-tooth" style="font-size: 40px; color: var(--accent-cyan); display: block; margin-bottom: 12px;"></i>
+                                    <p>اختر سناً من مخطط الفك التفاعلي لعرض حالته الطبية وتعديل خطة العلاج وتفاصيل التكلفة</p>
+                                </div>
+                                
+                                <div id="toothEditForm" class="tooth-edit-form hidden">
+                                    <h3 id="selectedToothTitle">تعديل السن رقم: --</h3>
+                                    <hr class="form-divider">
+                                    
+                                    <div class="form-group">
+                                        <label>حالة السن الحالية (انقر للتغيير):</label>
+                                        <div class="condition-btn-grid">
+                                            <button class="btn btn-condition healthy" data-condition="HEALTHY" onclick="setToothCondition('HEALTHY')">سليم</button>
+                                            <button class="btn btn-condition decayed" data-condition="DECAYED" onclick="setToothCondition('DECAYED')">تسوس</button>
+                                            <button class="btn btn-condition missing" data-condition="MISSING" onclick="setToothCondition('MISSING')">مفقود/قلع</button>
+                                            <button class="btn btn-condition implanted" data-condition="IMPLANTED" onclick="setToothCondition('IMPLANTED')">زراعة</button>
+                                            <button class="btn btn-condition crowned" data-condition="CROWNED" onclick="setToothCondition('CROWNED')">تلبيسة</button>
+                                            <button class="btn btn-condition root-canal" data-condition="ROOT_CANAL" onclick="setToothCondition('ROOT_CANAL')">علاج عصب</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="toothTreatmentPlan">العلاج المطلوب (خطة العلاج):</label>
+                                        <textarea id="toothTreatmentPlan" rows="3" placeholder="العلاج المطلوب كتابته هنا..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group-row">
+                                        <div class="form-group">
+                                            <label for="toothTreatmentCost">التكلفة (د.ع):</label>
+                                            <input type="number" id="toothTreatmentCost" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="toothPaidAmount">المدفوع واصل (د.ع):</label>
+                                            <input type="number" id="toothPaidAmount" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="toothDoctorSelect">الطبيب المنفذ:</label>
+                                            <select id="toothDoctorSelect">
+                                                <!-- Dynamic doctors list -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary btn-block" onclick="saveToothState()">
+                                        <i class="fa-solid fa-save"></i> حفظ وتعديل السن
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Right panel: Jaw diagrams -->
+                            <div class="chart-visual-panel glass-card">
+                                <div class="chart-controls-row">
+                                    <button class="btn btn-secondary btn-sm" onclick="printDentalChart()"><i class="fa-solid fa-print"></i> طباعة مخطط الفك</button>
+                                    <div class="legend-row">
+                                        <div class="legend-item"><span class="color-dot healthy"></span> سليم</div>
+                                        <div class="legend-item"><span class="color-dot decayed"></span> تسوس</div>
+                                        <div class="legend-item"><span class="color-dot missing"></span> مفقود/قلع</div>
+                                        <div class="legend-item"><span class="color-dot implanted"></span> زراعة</div>
+                                        <div class="legend-item"><span class="color-dot crowned"></span> تلبيسة</div>
+                                        <div class="legend-item"><span class="color-dot root-canal"></span> علاج عصب</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="jaw-wrapper">
+                                    <h4 class="jaw-title">الفك العلوي (Upper Jaw)</h4>
+                                    <div class="teeth-row" id="upperTeethRow">
+                                        <!-- Upper teeth 16 down to 1 rendered dynamically -->
+                                    </div>
+                                </div>
+                                
+                                <div class="jaw-separator-line"></div>
+                                
+                                <div class="jaw-wrapper">
+                                    <div class="teeth-row" id="lowerTeethRow">
+                                        <!-- Lower teeth 32 down to 17 rendered dynamically -->
+                                    </div>
+                                    <h4 class="jaw-title">الفك السفلي (Lower Jaw)</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- View B: Medical Atlas Educational Grid -->
+                    <div class="dental-view-pane" id="dental-view-atlas">
+                        <div class="atlas-control-row">
+                            <div class="button-group-row">
+                                <button class="btn btn-danger owner-only" onclick="clearAllAtlasCards()" id="btn-clear-atlas">
+                                    <i class="fa-solid fa-trash-can"></i> حذف كل البطاقات
+                                </button>
+                                <button class="btn btn-primary" onclick="showAddAtlasCardModal()">
+                                    <i class="fa-solid fa-plus-circle"></i> إضافة كارت / مرجع تعليمي جديد
+                                </button>
+                            </div>
+                            <h3>دليل الأسنان والحشوات والتقويم والابتسامات للمرضى</h3>
+                        </div>
+                        <div class="atlas-grid" id="atlasCardsGrid">
+                            <!-- Dynamic reference cards with real illustrations -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. BILLING & FINANCE TAB -->
+                <section class="tab-pane" id="tab-billing">
+                    <div class="financial-summary-cards">
+                        <div class="fin-summary-card glass-card">
+                            <span>إجمالي المبيعات / الإيرادات</span>
+                            <h2 class="text-emerald" id="fin-revenue-total">0 د.ع</h2>
+                        </div>
+                        <div class="fin-summary-card glass-card">
+                            <span>المبالغ المقبوضة فعلياً</span>
+                            <h2 class="text-blue" id="fin-received-total">0 د.ع</h2>
+                        </div>
+                        <div class="fin-summary-card glass-card">
+                            <span>الديون والمستحقات المتبقية</span>
+                            <h2 class="text-warning" id="fin-debts-total">0 د.ع</h2>
+                        </div>
+                        <div class="fin-summary-card glass-card">
+                            <span>إجمالي المصروفات التشغيلية</span>
+                            <h2 class="text-danger" id="fin-expenses-total">0 د.ع</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="billing-sections-layout">
+                        <!-- Left Panel: Expenses Log -->
+                        <div class="billing-card glass-card">
+                            <div class="panel-header">
+                                <h3>سجل النفقات والمصروفات</h3>
+                                <div class="button-group-row">
+                                    <button class="btn btn-danger btn-sm owner-only" onclick="clearAllExpenses()" id="btn-clear-expenses"><i class="fa-solid fa-trash-can"></i> حذف الكل</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="printExpensesTable()"><i class="fa-solid fa-print"></i> طباعة</button>
+                                    <button class="btn btn-danger btn-sm" onclick="showAddExpenseModal()" style="background:var(--grad-red);">تسجيل مصروف</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>المصروف</th>
+                                            <th>الفئة</th>
+                                            <th>المبلغ (د.ع)</th>
+                                            <th>التاريخ</th>
+                                            <th>العمليات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expensesTableBody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Panel: Invoices -->
+                        <div class="billing-card glass-card">
+                            <div class="panel-header">
+                                <h3>الفواتير وسندات القبض للمرضى</h3>
+                                <div class="button-group-row">
+                                    <button class="btn btn-danger btn-sm owner-only" onclick="clearAllInvoices()" id="btn-clear-invoices"><i class="fa-solid fa-trash-can"></i> حذف الكل</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="printInvoicesTable()"><i class="fa-solid fa-print"></i> طباعة</button>
+                                    <button class="btn btn-primary btn-sm" onclick="showCreateInvoiceModal()">إنشاء فاتورة جديدة</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>رقم الفاتورة</th>
+                                            <th>المريض</th>
+                                            <th>المبلغ الإجمالي</th>
+                                            <th>المدفوع</th>
+                                            <th>المتبقي</th>
+                                            <th>الحالة</th>
+                                            <th>العمليات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoicesTableBody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. FINANCIAL AUDIT & ANNUAL AUDITING (جرد الحسابات المطور - إحصائيات مالية ونسب تقدم نيون) -->
+                <section class="tab-pane owner-only" id="tab-financial-audit">
+                    <div class="stats-cards-grid">
+                        <div class="stat-card glass-card green" style="min-height: 140px;">
+                            <div class="icon"><i class="fa-solid fa-calendar-day"></i></div>
+                            <div class="info">
+                                <span>جرد اليوم (Today)</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+                                    <div style="font-size: 12.5px; color: var(--text-muted);">الحساب الكامل:</div>
+                                    <h3 id="audit-rev-today" class="text-emerald" style="margin: 0; font-size: 18px; font-weight: 900;">0 د.ع</h3>
+                                    <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">نصف الحساب (50%):</div>
+                                    <span id="audit-half-today" style="font-size: 16px; font-weight: 800; color: #60a5fa;">0 د.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card blue" style="min-height: 140px;">
+                            <div class="icon"><i class="fa-solid fa-calendar-week"></i></div>
+                            <div class="info">
+                                <span>جرد الأسبوع (Weekly)</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+                                    <div style="font-size: 12.5px; color: var(--text-muted);">الحساب الكامل:</div>
+                                    <h3 id="audit-rev-week" class="text-blue" style="margin: 0; font-size: 18px; font-weight: 900;">0 د.ع</h3>
+                                    <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">نصف الحساب (50%):</div>
+                                    <span id="audit-half-week" style="font-size: 16px; font-weight: 800; color: #60a5fa;">0 د.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card purple" style="min-height: 140px;">
+                            <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+                            <div class="info">
+                                <span>جرد الشهر (Monthly)</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+                                    <div style="font-size: 12.5px; color: var(--text-muted);">الحساب الكامل:</div>
+                                    <h3 id="audit-rev-month" class="text-purple" style="margin: 0; font-size: 18px; font-weight: 900;">0 د.ع</h3>
+                                    <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">نصف الحساب (50%):</div>
+                                    <span id="audit-half-month" style="font-size: 16px; font-weight: 800; color: #60a5fa;">0 د.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-card orange" style="min-height: 140px;">
+                            <div class="icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <div class="info">
+                                <span>صافي الأرباح الكلية</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px;">
+                                    <div style="font-size: 12.5px; color: var(--text-muted);">صافي الربح:</div>
+                                    <h3 id="audit-net-profit" class="text-warning" style="margin: 0; font-size: 18px; font-weight: 900;">0 د.ع</h3>
+                                    <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">نصف صافي الأرباح:</div>
+                                    <span id="audit-half-total" style="font-size: 16px; font-weight: 800; color: #fb7185;">0 د.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="financial-progress-bars-panel glass-card p-4 mt-3 font-arabic">
+                        <h3>مؤشرات قياس الكفاءة والنمو المالي</h3>
+                        <div class="progress-wrapper mt-3">
+                            <div class="progress-info-row">
+                                <span>نسبة المقبوضات النقدية إلى إجمالي المبيعات:</span>
+                                <strong id="progressPercent1">0%</strong>
+                            </div>
+                            <div class="bar-outer">
+                                <div class="bar-inner green" id="barFill1" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-wrapper mt-3">
+                            <div class="progress-info-row">
+                                <span>نسبة النفقات التشغيلية من المبيعات الكلية:</span>
+                                <strong id="progressPercent2">0%</strong>
+                            </div>
+                            <div class="bar-outer">
+                                <div class="bar-inner red" id="barFill2" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card table-panel p-4 mt-3">
+                        <div class="box-header-row">
+                            <h3>تقرير الجرد المالي اليومي للعيادة (يوم بيومه)</h3>
+                            <button class="btn btn-secondary btn-sm" onclick="printFinancialAuditReport()"><i class="fa-solid fa-print"></i> طباعة تقرير الجرد</button>
+                        </div>
+                        
+                        <div class="table-responsive mt-3">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ / اليوم</th>
+                                        <th>عدد الفواتير</th>
+                                        <th>صافي الإيرادات</th>
+                                        <th>المقبوضات النقدية</th>
+                                        <th>المصروفات والنفقات</th>
+                                        <th>الصافي المالي لليوم</th>
+                                        <th>الحالة المحاسبية</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditFinancialTableBody">
+                                    <!-- Dynamic daily rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. INVENTORY & EQUIPMENT TAB (المخزن والأجهزة) -->
+                <section class="tab-pane" id="tab-inventory">
+                    <div class="inventory-split-layout">
+                        <!-- Materials inventory -->
+                        <div class="inventory-card glass-card">
+                            <div class="panel-header">
+                                <h3>مخزون المواد الطبية والأدوية المستهلكة</h3>
+                                <div class="button-group-row">
+                                    <button class="btn btn-danger btn-sm owner-only" onclick="clearAllInventory()" id="btn-clear-inventory"><i class="fa-solid fa-trash-can"></i> تفريغ المواد</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="printInventoryTable()"><i class="fa-solid fa-print"></i> طباعة</button>
+                                    <button class="btn btn-primary btn-sm" onclick="showAddMaterialModal()">إضافة مادة</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>المادة</th>
+                                            <th>الكمية الحالية</th>
+                                            <th>الحد الأدنى للتنبيه</th>
+                                            <th>المورد</th>
+                                            <th>تاريخ الانتهاء</th>
+                                            <th>العمليات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventoryTableBody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Equipment checklist -->
+                        <div class="inventory-card glass-card">
+                            <div class="panel-header">
+                                <h3>صيانة الأجهزة والمعدات الطبية</h3>
+                                <div class="button-group-row">
+                                    <button class="btn btn-danger btn-sm owner-only" onclick="clearAllEquipments()" id="btn-clear-equipments"><i class="fa-solid fa-trash-can"></i> حذف الأجهزة</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="printEquipmentTable()"><i class="fa-solid fa-print"></i> طباعة</button>
+                                    <button class="btn btn-primary btn-sm" onclick="showAddEquipmentModal()">تسجيل جهاز</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الجهاز / الوحدة</th>
+                                            <th>تاريخ الشراء</th>
+                                            <th>انتهاء الضمان</th>
+                                            <th>حالة الجهاز</th>
+                                            <th>العمليات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="equipmentTableBody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. STAFF & PERMISSIONS TAB (الموظفون والصلاحيات) -->
+                <section class="tab-pane" id="tab-staff">
+                    <div class="staff-tabs-switcher">
+                        <button class="btn-tab-switch active" onclick="switchStaffSubTab('staff-list')">قائمة الموظفين والرواتب</button>
+                        <button class="btn-tab-switch" onclick="switchStaffSubTab('attendance')">سجل الحضور والانصراف والورديات</button>
+                    </div>
+                    
+                    <div id="subtab-staff-list" class="staff-sub-pane active">
+                        <div class="panel-header-row">
+                            <div class="button-group-row">
+                                <button class="btn btn-danger owner-only" onclick="clearAllStaff()" id="btn-clear-staff">
+                                    <i class="fa-solid fa-user-minus"></i> حذف جميع الكادر
+                                </button>
+                                <button class="btn btn-secondary" onclick="printStaffList()"><i class="fa-solid fa-print"></i> طباعة</button>
+                                <button class="btn btn-primary" onclick="showAddEmployeeModal()">تعيين موظف جديد</button>
+                            </div>
+                            <h3>الكادر الوظيفي النشط</h3>
+                        </div>
+                        <div class="staff-grid" id="staffMembersGrid">
+                            <!-- Dynamic employee cards -->
+                        </div>
+                    </div>
+                    
+                    <div id="subtab-attendance" class="staff-sub-pane">
+                        <div class="attendance-control-panel glass-card">
+                            <h3>تسجيل الحضور اليومي السريع</h3>
+                            <div class="attendance-action-grid" id="quickAttendanceGrid">
+                                <!-- Dynamic check-in/out buttons -->
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card mt-4">
+                            <div class="box-header-row">
+                                <h3>سجل الدخول والمغادرة التفصيلي</h3>
+                                <button class="btn btn-secondary btn-sm" onclick="printAttendanceLogs()"><i class="fa-solid fa-print"></i> طباعة السجل</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الموظف</th>
+                                            <th>الدور</th>
+                                            <th>وقت الحضور</th>
+                                            <th>وقت الانصراف</th>
+                                            <th>ساعات العمل الفعالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceTableBody">
+                                        <!-- Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 10. GENERAL CONFIGS TAB (الإعدادات العامة) -->
+                <section class="tab-pane" id="tab-settings">
+                    <div class="settings-grid-layout">
+                        <!-- Left Panel: Doctors management -->
+                        <div class="settings-panel-box glass-card font-arabic">
+                            <h3>قائمة الأطباء المعتمدين بالعيادة</h3>
+                            <hr class="form-divider">
+                            
+                            <div class="add-doctor-inline-form">
+                                <h4>إضافة طبيب جديد يدوي:</h4>
+                                <div class="doctor-inline-row">
+                                    <div class="form-group">
+                                        <input type="text" id="newDocName" placeholder="اسم الطبيب الثلاثي...">
+                                    </div>
+                                    <button class="btn btn-primary" onclick="submitAddDoctorInline()" style="background:var(--accent-emerald);">
+                                        إضافة
+                                    </button>
+                                </div>
+                            </div>
+
+                            <hr class="form-divider">
+                            
+                            <h4>الأطباء المسجلين حالياً:</h4>
+                            <div class="doctors-list-items mt-2" id="settingsDoctorsList">
+                                <!-- Loaded dynamically, matching Screenshot 5 list -->
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Clinic Info (بيانات ومعلومات العيادة للطباعة) -->
+                        <div class="settings-panel-box glass-card font-arabic">
+                            <h3>بيانات ومعلومات العيادة للطباعة</h3>
+                            <hr class="form-divider">
+                            
+                            <div class="clinic-info-form">
+                                <div class="form-group-row-2" style="display: flex; gap: 15px;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="setClinicName">اسم العيادة (بالعربية):</label>
+                                        <input type="text" id="setClinicName" value="" placeholder="أدخل اسم العيادة بالعربية...">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="setClinicNameEn">اسم العيادة (بالإنجليزية):</label>
+                                        <input type="text" id="setClinicNameEn" value="" placeholder="Enter clinic name in English...">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="setClinicManager">اسم مدير العيادة المسؤول:</label>
+                                    <input type="text" id="setClinicManager" value="" placeholder="أدخل اسم المدير المسؤول...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="setClinicHours">أوقات الدوام الرسمي (ساعة العمل):</label>
+                                    <input type="text" id="setClinicHours" value="4:00 مساءً - 8:00 مساءً">
+                                </div>
+                                <div class="form-group">
+                                    <label for="setClinicAddress">العنوان الجغرافي:</label>
+                                    <input type="text" id="setClinicAddress" value="" placeholder="أدخل العنوان الجغرافي...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="setClinicPhone">رقم هاتف العيادة (للتواصل في الفاتورة):</label>
+                                    <input type="text" id="setClinicPhone" placeholder="أدخل رقم الهاتف للعيادة...">
+                                </div>
+                                <div class="form-group-row-2">
+                                    <div class="form-group" style="flex:1;">
+                                        <label for="setClinicCurrency">العملة الافتراضية للفوترة:</label>
+                                        <input type="text" id="setClinicCurrency" value="د.ع">
+                                    </div>
+                                    <div class="form-group" style="flex:1;">
+                                        <label for="setClinicTax">الضرائب والرسوم %:</label>
+                                        <input type="number" id="setClinicTax" value="0">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mt-3">
+                                    <label>رفع وتغيير شعار العيادة (للطباعة):</label>
+                                    <div style="display:flex; align-items:center; gap:15px;">
+                                        <input type="file" id="clinicLogoUpload" accept="image/*" onchange="previewClinicLogoSelected()">
+                                        <img src="assets/logo.jpg" alt="Logo preview" class="clinic-logo-thumbnail" id="clinicLogoPreviewImg">
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary btn-block mt-4" onclick="saveGeneralSettings()" style="background:#007f7f;">
+                                    حفظ الإعدادات العامة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 11. DATABASE MANAGER TAB (مدير قواعد البيانات - المالك فقط) -->
+                <section class="tab-pane owner-only" id="tab-database-manager">
+                    <div class="dashboard-columns-row">
+                        <div class="dashboard-panel glass-card">
+                            <h3>أدوات قاعدة البيانات والنسخ الاحتياطي</h3>
+                            <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:15px;">
+                                يمكنك تصفير كافة السجلات والبدء مجدداً، أو اختيار ملف متزامن محلي، وتصدير النسخة الاحتياطية لتأمين بيانات المرضى.
+                            </p>
+                            <div class="form-buttons-row" style="flex-direction:column; gap:12px;">
+                                <button class="btn btn-danger" onclick="createNewDatabaseSimulated()">
+                                    <i class="fa-solid fa-trash-arrow-up"></i> تصفير النظام والبدء بقاعدة جديدة
+                                </button>
+                                <button class="btn btn-primary" onclick="triggerDatabaseImportSelect()">
+                                    <i class="fa-solid fa-upload"></i> استيراد ملف قاعدة بيانات (.json)
+                                </button>
+                                <input type="file" id="dbImportFileInput" accept=".json" style="display:none;" onchange="handleDatabaseImport(this)">
+                                <button class="btn btn-secondary" onclick="exportDatabaseSimulated()">
+                                    <i class="fa-solid fa-download"></i> تصدير قاعدة البيانات الحالية
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-panel glass-card">
+                            <h3>سجل النسخ الاحتياطية المتوفرة</h3>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الملف</th>
+                                            <th>التاريخ</th>
+                                            <th>الحجم</th>
+                                            <th>النوع</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="databaseBackupsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multiple Databases Manager Panel -->
+                    <div class="dashboard-panel glass-card mt-4 font-arabic" style="margin-top:20px;">
+                        <h3>إدارة وإنشاء قواعد بيانات متعددة (خاص بالمالك)</h3>
+                        <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:20px;">
+                            يمكنك إنشاء عزل تام لقواعد البيانات بالعيادة (مثال: قاعدة بيانات تجريبية، قاعدة بيانات فرع الشعب، إلخ) والتبديل بينها مباشرة.
+                        </p>
+                        
+                        <div style="display:flex; gap:15px; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1; min-width:250px;">
+                                <label for="newDbName">اسم قاعدة البيانات الجديدة:</label>
+                                <input type="text" id="newDbName" placeholder="مثال: قاعدة بيانات الفرع الرئيسي...">
+                            </div>
+                            <button class="btn btn-primary" onclick="createNewCustomDatabase()" style="background:var(--grad-emerald); height:45px;">
+                                <i class="fa-solid fa-folder-plus"></i> إنشاء قاعدة البيانات
+                            </button>
+                        </div>
+                        
+                        <h4>قواعد البيانات المتاحة لحسابك:</h4>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>اسم قاعدة البيانات</th>
+                                        <th>المفتاح البرمجي</th>
+                                        <th>الحالة التشغيلية</th>
+                                        <th style="width:180px; text-align:center;">إجراءات التحكم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customDatabasesTableBody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 12. SUBSCRIBER CLINICS TAB (المالك فقط) -->
+                <section class="tab-pane owner-only" id="tab-subscriber-clinics">
+                    <div class="control-row">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="clinicSearchInput" placeholder="البحث باسم العيادة أو كود المشترك...">
+                        </div>
+                        <button class="btn btn-primary" onclick="showAddClinicModal()">
+                            <i class="fa-solid fa-plus-square"></i> إضافة عيادة جديدة للمنصة
+                        </button>
+                    </div>
+                    
+                    <div class="clinics-grid" id="clinicsGridContainer">
+                        <!-- Dynamic subscriber clinic boxes -->
+                    </div>
+                </section>
+
+                <!-- 13. SUPPORT TAB (الحساب والدعم الفني - شات وسجل العمليات الكامل) -->
+                <section class="tab-pane" id="tab-support">
+                    <div class="support-grid">
+                        <div class="support-panel glass-card">
+                            <!-- شات لوج العمليات التفاعلي (NEW) -->
+                            <div class="chat-simulator-box" style="height: 380px;">
+                                <div class="chat-header">
+                                    <span class="online-indicator"></span>
+                                    <h4>شات المتابعة وسجل عمليات العيادة الفوري (Live Activity Chat Log)</h4>
+                                </div>
+                                <div class="chat-body" id="supportChatBody" style="background: rgba(3, 4, 8, 0.4);">
+                                    <!-- Log notifications and user actions rendered as chat items -->
+                                </div>
+                                <div class="chat-footer">
+                                    <input type="text" id="chatInputMessage" placeholder="اكتب ملاحظة لتدوينها في سجل العمليات العام للعيادة...">
+                                    <button class="btn btn-primary btn-sm" onclick="sendSupportChatMessage()">
+                                        <i class="fa-solid fa-paper-plane"></i> إرسال ملاحظة
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <hr class="form-divider">
+
+                            <h3>الدعم الفني المباشر وقنوات التواصل السريعة</h3>
+                            <p class="support-desc">تواصل معنا مباشرة عبر إحدى القنوات الرسمية التالية للحصول على استجابة فورية وحل للمشاكل الإدارية أو التقنية:</p>
+                            
+                            <div class="social-contact-grid">
+                                <a href="https://instagram.com/B88RP" target="_blank" class="contact-card instagram">
+                                    <i class="fa-brands fa-instagram"></i>
+                                    <div class="meta">
+                                        <span>إنستغرام</span>
+                                        <strong>@B88RP</strong>
+                                    </div>
+                                </a>
+                                <a href="https://t.me/SL2P9" target="_blank" class="contact-card telegram">
+                                    <i class="fa-brands fa-telegram"></i>
+                                    <div class="meta">
+                                        <span>تيليجرام</span>
+                                        <strong>@SL2P9</strong>
+                                    </div>
+                                </a>
+                                <a href="mailto:MohammedAldanhash@gmail.com" class="contact-card email">
+                                    <i class="fa-solid fa-envelope"></i>
+                                    <div class="meta">
+                                        <span>البريد الإلكتروني</span>
+                                        <strong>MohammedAldanhash@gmail.com</strong>
+                                    </div>
+                                </a>
+                                <a href="https://wa.me/9647855906001" target="_blank" class="contact-card whatsapp">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                    <div class="meta">
+                                        <span>واتساب الدعم</span>
+                                        <strong>07855906001</strong>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="support-panel glass-card">
+                            <div class="panel-header">
+                                <h3>فتح تذكرة دعم فني جديدة</h3>
+                                <button class="btn btn-danger btn-sm owner-only" onclick="clearAllTickets()" id="btn-clear-tickets"><i class="fa-solid fa-trash-can"></i> مسح التذاكر</button>
+                            </div>
+                            <hr class="form-divider">
+                            <div class="support-ticket-form">
+                                <div class="form-group">
+                                    <label for="ticketSubject">عنوان المشكلة / الاستفسار:</label>
+                                    <input type="text" id="ticketSubject" placeholder="مثال: مشكلة في حساب الضريبة بصنف الفواتير...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketCategory">القسم المعني:</label>
+                                    <select id="ticketCategory">
+                                        <option value="technical">مشكلة تقنية برمجية</option>
+                                        <option value="billing">الاشتراكات والمدفوعات</option>
+                                        <option value="feature">طلب إضافة ميزة جديدة</option>
+                                        <option value="training">استفسار حول استخدام ميزة</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketPriority">الأولوية:</label>
+                                    <select id="ticketPriority">
+                                        <option value="low">منخفضة</option>
+                                        <option value="medium">متوسطة</option>
+                                        <option value="high">عاجلة / حرجة</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketDescription">تفاصيل المشكلة والخطوات لإعادة إنتاجها:</label>
+                                    <textarea id="ticketDescription" rows="4" placeholder="يرجى كتابة التفاصيل هنا..."></textarea>
+                                </div>
+                                <button class="btn btn-primary btn-block" onclick="createSupportTicketSubmit()">
+                                    <i class="fa-solid fa-circle-plus"></i> إرسال تذكرة الدعم الفني
+                                </button>
+                            </div>
+                            
+                            <h3 class="mt-4">التذاكر النشطة ومتابعة الحالة</h3>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>كود التذكرة</th>
+                                            <th>الموضوع</th>
+                                            <th>القسم</th>
+                                            <th>الأولوية</th>
+                                            <th>العمليات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ticketsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 14. SYSTEM INFO TAB -->
+                <section class="tab-pane" id="tab-system-info">
+                    <div class="system-info-wrapper">
+                        <div class="system-info-card glass-card">
+                            <div class="logo-box">
+                                <img src="assets/logo.jpg" alt="Logo" class="sys-logo">
+                                <h2>منصة سُبل</h2>
+                            </div>
+                            
+                            <p class="sys-description text-center">
+                                منصة سبل هي نظام إدارة أوفلاين متكامل، مصمم لعيادات ومراكز الأسنان لتقديم رعاية طبية منظمة وموثوقة. يتيح النظام إدارة ملفات وسجلات المرضى الطبية بشكل تفاعلي، ومتابعة حجوزات ومواعيد العيادة، وجرد الحسابات والأقساط والتدفق المالي اليومي، بالإضافة إلى إدارة وتتبع نواقص المخزن والأجهزة.
+                            </p>
+                            
+                            <hr class="form-divider">
+                            
+                            <div class="sys-meta-list">
+                                <div class="sys-meta-row">
+                                    <span>إصدار النظام الحالي:</span>
+                                    <strong>(Build 2026.07) 1.0.0</strong>
+                                </div>
+                                <div class="sys-meta-row">
+                                    <span>حالة الترخيص:</span>
+                                    <strong class="green-text">مرخص مدى الحياة (أوفلاين للفرع الحالي)</strong>
+                                </div>
+                                <div class="sys-meta-row">
+                                    <span>الجهة المبرمجة للمنصة:</span>
+                                    <strong>محمد يوسف اسعد</strong>
+                                </div>
+                            </div>
+                            
+                            <hr class="form-divider">
+                            
+                            <h4 class="text-center font-arabic" style="font-size:12px; margin-bottom:12px;">قنوات الدعم الفني المباشر للمنصة:</h4>
+                            <div class="sys-social-row">
+                                <a href="mailto:MohammedAldanhash@gmail.com" class="sys-social-btn email">
+                                    <i class="fa-solid fa-envelope"></i> البريد الإلكتروني
+                                </a>
+                                <a href="https://t.me/SL2P9" target="_blank" class="sys-social-btn telegram">
+                                    <i class="fa-brands fa-telegram"></i> تيليجرام
+                                </a>
+                                <a href="https://instagram.com/B88RP" target="_blank" class="sys-social-btn instagram">
+                                    <i class="fa-brands fa-instagram"></i> إنستغرام
+                                </a>
+                                <a href="https://wa.me/9647855906001" target="_blank" class="sys-social-btn whatsapp">
+                                    <i class="fa-brands fa-whatsapp"></i> واتساب الدعم
+                                </a>
+                            </div>
+                            
+                            <div class="sys-footer-rights text-center mt-4">
+                                <span>جميع الحقوق محفوظة © منصة سُبل 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. MODALS WINDOWS (النوافذ المنبثقة) -->
+    <!-- ========================================== -->
+    
+    <!-- 3.1 LOCK SCREEN WINDOW (شاشة القفل) -->
+    <div class="modal-overlay hidden" id="lockScreenModal" style="z-index: 1000000;">
+        <div class="modal-card lock-card glass-card">
+            <div class="lock-icon-area">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2>المنصة مقفلة للحماية</h2>
+            <p>أدخل كلمة مرور الحساب لإلغاء القفل</p>
+            <div class="form-group mt-3">
+                <input type="password" id="unlockPasswordInput" placeholder="أدخل كلمة المرور للفتح..." style="text-align: center;">
+            </div>
+            <div class="lock-error-msg hidden" id="unlockError">
+                كلمة المرور خاطئة!
+            </div>
+            <button class="btn btn-primary btn-block" onclick="unlockSystemSubmit()">
+                إلغاء قفل النظام
+            </button>
+        </div>
+    </div>
+
+    <!-- 3.2 ADD/EDIT PATIENT MODAL -->
+    <div class="modal-overlay hidden" id="addPatientModal">
+        <div class="modal-card glass-card modal-large">
+            <div class="modal-header">
+                <h3 id="patientModalTitle">تسجيل ملف مريض جديد</h3>
+                <button class="close-btn" onclick="closeModal('addPatientModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editPatientId" value="">
+            
+            <div class="modal-body">
+                <div class="patient-form-grid">
+                    <!-- Column 1 (Right): Personal Info -->
+                    <div class="grid-column">
+                        <h4 class="form-section-title"><i class="fa-solid fa-user"></i> البيانات الشخصية للمريض</h4>
+                        <div class="form-group">
+                            <label for="newPatName">الاسم الكامل للمريض:</label>
+                            <input type="text" id="newPatName" placeholder="أدخل الاسم الثلاثي...">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPatAge">عمر المريض (مثال: 24 سنة):</label>
+                            <input type="text" id="newPatAge" placeholder="أدخل عمر المريض بالكامل...">
+                        </div>
+
+                        <div class="form-group-row-2">
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatGender">الجنس:</label>
+                                <select id="newPatGender">
+                                    <option value="ذكر">ذكر</option>
+                                    <option value="أنثى">أنثى</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatNationality">الجنسية:</label>
+                                <input type="text" id="newPatNationality" value="عراقي">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label for="newPatAddress">العنوان السكني:</label>
+                            <input type="text" id="newPatAddress" placeholder="مثال: بغداد، الشعب..." style="font-family: 'Cairo', sans-serif;">
+                        </div>
+                    </div>
+
+                    <!-- Column 2 (Left): Clinical Info -->
+                    <div class="grid-column">
+                        <h4 class="form-section-title"><i class="fa-solid fa-stethoscope"></i> البيانات الطبية والمالية</h4>
+                        <div class="form-group">
+                            <label for="newPatPhone">رقم هاتف التواصل:</label>
+                            <input type="text" id="newPatPhone" placeholder="07xxxxxxxxx">
+                        </div>
+
+                        <div class="form-group-row-2">
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatDoctor">الطبيب المتابع:</label>
+                                <select id="newPatDoctor" style="font-family: 'Cairo', sans-serif;">
+                                    <!-- Dynamic doctors list -->
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatPaymentMethod">طريقة الدفع:</label>
+                                <select id="newPatPaymentMethod" style="font-family: 'Cairo', sans-serif;">
+                                    <option value="نقداً">نقداً (Cash)</option>
+                                    <option value="زين كاش">زين كاش (Zain Cash)</option>
+                                    <option value="ماستر كارد">ماستر كارد (Mastercard)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Financial Overrides Row (السابق، الكامل، الواصل) -->
+                        <div class="form-group-row-3" style="display: flex; gap: 10px; margin-bottom: 12px;">
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatPreviousDebt">الحساب السابق:</label>
+                                <input type="text" id="newPatPreviousDebt" placeholder="0" style="font-family: 'Cairo', sans-serif; text-align: center;">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatGrandTotal">المبلغ الكامل:</label>
+                                <input type="text" id="newPatGrandTotal" placeholder="0" style="font-family: 'Cairo', sans-serif; text-align: center;">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="newPatAmountPaid">المبلغ الواصل:</label>
+                                <input type="text" id="newPatAmountPaid" placeholder="0" style="font-family: 'Cairo', sans-serif; text-align: center;">
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Treatments Section -->
+                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 12px; font-family: 'Cairo', sans-serif;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h5 style="margin: 0; font-weight: 700; color: var(--accent-cyan); font-size: 11.5px;">الخطط والعلاجات الطبية والمالية المسجلة:</h5>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="addTreatmentRowDynamic()" style="background: var(--accent-emerald); padding: 4px 10px; font-size: 11.5px; height: auto; font-family: 'Cairo', sans-serif;">
+                                    <i class="fa-solid fa-plus"></i> إضافة علاج جديد
+                                </button>
+                            </div>
+                            
+                            <!-- Dynamic Table Headers -->
+                            <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 0.7fr 40px; gap: 8px; margin-bottom: 6px; font-weight: bold; font-size: 11px; color: var(--accent-cyan); text-align: center; padding-left: 5px;">
+                                <div>نوع الإجراء / العلاج</div>
+                                <div>سعر العلاج الكلي</div>
+                                <div>الواصل المدفوع</div>
+                                <div>الجلسات</div>
+                                <div>حذف</div>
+                            </div>
+                            
+                            <div id="patientTreatmentsContainer" style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; padding-left: 5px;">
+                                <!-- Dynamic rows added here -->
+                            </div>
+                        </div>
+
+                        <!-- Next Session Scheduling Fields -->
+                        <div class="next-session-scheduler-box mt-3" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px;">
+                            <h5 style="margin-bottom:8px; font-weight:700; color:var(--accent-cyan); font-size:11.5px;">حجز موعد الجلسة التالية تلقائياً (Next Appointment):</h5>
+                            <div style="display:flex; gap:10px;">
+                                <div class="form-group" style="flex:1;">
+                                    <label for="newPatNextSessionDate">التاريخ:</label>
+                                    <input type="date" id="newPatNextSessionDate">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label for="newPatNextSessionTime">التوقيت (مثال: 04:00 م):</label>
+                                    <input type="text" id="newPatNextSessionTime" placeholder="مثال: 04:00 م...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Span both columns -->
+                <div class="full-width-section mt-3">
+                    <h4 class="form-section-title"><i class="fa-solid fa-notes-medical"></i> التحسس والتاريخ الطبي للمريض</h4>
+                    <div class="form-group-row-2">
+                        <div class="form-group" style="flex:1;">
+                            <label for="newPatAllergies">الحساسية والموانع الطبية (إن وجدت):</label>
+                            <input type="text" id="newPatAllergies" value="لا" placeholder="أدخل أي أدوية أو تحسسات تمنع علاج المريض...">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="newPatHistory">الأمراض المزمنة والعامة:</label>
+                            <input type="text" id="newPatHistory" value="لا" placeholder="سكري، ضغط، سيولة الدم، إلخ...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="full-width-section mt-3">
+                    <h4 class="form-section-title"><i class="fa-solid fa-comment-dots"></i> إرسال رسالة ترحيب وشكر بعد الحفظ</h4>
+                    <div class="form-group">
+                        <label for="newPatWelcomeMsg">اختر قالب الرسالة الترحيبية (واتساب):</label>
+                        <select id="newPatWelcomeMsg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: #fff; width: 100%; padding: 8px; border-radius: 6px;">
+                            <option value="none">-- عدم إرسال رسالة ترحيبية --</option>
+                            <option value="thanks">شكراً لك على ثقتك بنا (افتراضية)</option>
+                            <option value="welcome">مرحباً بك في العيادة، نسعد دائماً بتقديم أفضل رعاية طبية لأسنانك</option>
+                            <option value="custom">رسالة شكر وتقدير خاصة لزيارتك الأولى</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addPatientModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddPatient()">حفظ ملف المريض</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.3 ADD/EDIT APPOINTMENT MODAL -->
+    <div class="modal-overlay hidden" id="addAppointmentModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="appointmentModalTitle">حجز موعد فحص جديد</h3>
+                <button class="close-btn" onclick="closeModal('addAppointmentModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editAppointmentId" value="">
+            <div class="modal-body">
+                <div class="form-group" style="position: relative;">
+                    <label for="aptPatientName">اسم المراجع:</label>
+                    <input type="text" id="aptPatientName" placeholder="اكتب اسم المراجع..." autocomplete="off" oninput="handleAptPatientNameInput()">
+                    <div id="aptPatientSuggestions" class="suggestions-dropdown hidden" style="position: absolute; top: 100%; right: 0; left: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; z-index: 1000; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.6);"></div>
+                </div>
+                <div class="form-group">
+                    <label for="aptDoctorSelect">الطبيب المعالج:</label>
+                    <select id="aptDoctorSelect">
+                        <!-- Dynamic -->
+                    </select>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="aptDate">تاريخ الحجز:</label>
+                        <input type="date" id="aptDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="aptTime">التوقيت (كتابة):</label>
+                        <input type="text" id="aptTime" placeholder="مثال: 05:00 م أو 11:30 ص...">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="aptTreatmentType">نوع الإجراء العلاجي:</label>
+                        <input type="text" id="aptTreatmentType" placeholder="مثال: حشوه جذر، زراعة...">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="aptPhone">رقم هاتف المراجع (للتنبيهات):</label>
+                        <input type="text" id="aptPhone" placeholder="أدخل رقم الهاتف...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="aptNotes">ملاحظات إضافية:</label>
+                    <input type="text" id="aptNotes" placeholder="أدخل أي ملاحظات للحجز...">
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addAppointmentModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddAppointment()">تأكيد وحفظ الموعد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.4 CREATE/EDIT INVOICE MODAL -->
+    <div class="modal-overlay hidden" id="createInvoiceModal">
+        <div class="modal-card glass-card modal-large">
+            <div class="modal-header">
+                <h3 id="invoiceModalTitle">إنشاء فاتورة علاجية وصرف سند</h3>
+                <button class="close-btn" onclick="closeModal('createInvoiceModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editInvoiceId" value="">
+            
+            <div class="modal-body invoice-creator-layout">
+                <!-- Configurator side -->
+                <div class="invoice-form-side">
+                    <h4 class="form-section-title"><i class="fa-solid fa-calculator"></i> خيارات الحساب والفوترة</h4>
+                    
+                    <div class="form-group">
+                        <label for="invPatientSelect">اختر المريض المعني:</label>
+                        <select id="invPatientSelect" onchange="calculateSuggestedInvoiceAmount()">
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>حدد الإجراءات والأسنان المطلوب إدراجها بالتقرير المالي:</label>
+                        <div class="treatment-select-list" id="invoiceTreatmentsList">
+                            <!-- Checkboxes loaded dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-row">
+                        <div class="form-group" style="flex:1;">
+                            <label for="invDiscount">الخصم الممنوح (د.ع):</label>
+                            <input type="number" id="invDiscount" value="0" oninput="recalculateInvoiceTotal()">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="invTax">نسبة الضريبة %:</label>
+                            <input type="number" id="invTax" value="0" oninput="recalculateInvoiceTotal()">
+                        </div>
+                    </div>
+
+                    <div class="form-group-row mt-2">
+                        <div class="form-group" style="flex:1;">
+                            <label for="invAmountPaid">المبلغ النقدي المدفوع حالياً:</label>
+                            <input type="number" id="invAmountPaid" value="0" oninput="recalculateInvoiceTotal()">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>المبلغ المتبقي (أقساط / دين مؤجل):</label>
+                            <input type="text" id="invAmountRemaining" value="0 د.ع" disabled class="disabled-highlight">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Premium Printed Preview side (A4 Letterhead layout style) -->
+                <div class="invoice-preview-side">
+                    <h4 class="form-section-title"><i class="fa-solid fa-eye"></i> سند الفاتورة الطبي للمريض (معاينة)</h4>
+                    
+                    <div class="invoice-print-preview glass-card" id="invoicePrintArea">
+                        <!-- Invoice logo and clinic coordinates -->
+                        <div class="preview-header">
+                            <img src="assets/logo.jpg" alt="Logo" class="invoice-logo" id="invoicePrintLogo">
+                            <div class="clinic-info">
+                                <h3 id="invoicePrintClinicName">منصة سبل</h3>
+                                <span id="invoicePrintClinicHours">أوقات الدوام: 4:00 مساءً - 8:00 مساءً</span>
+                                <span id="invoicePrintClinicAddress">العنوان: بغداد، الشعب، شارع عدن</span>
+                                <span id="invoicePrintClinicPhone">هاتف العيادة: --</span>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-badge-status-watermark" id="previewWatermark">سند رسمي</div>
+                        <hr class="preview-divider">
+                        
+                        <!-- Invoice metadata -->
+                        <div class="preview-meta">
+                            <div>الاسم: <strong id="print-inv-patient">--</strong></div>
+                            <div>تاريخ الإصدار: <strong id="print-inv-date">--/--/----</strong></div>
+                            <div>رقم الملف الموحد: <strong id="print-inv-id" class="text-emerald">INV-XXXX</strong></div>
+                        </div>
+                        
+                        <!-- Table items -->
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">ت</th>
+                                    <th style="text-align:right;">البيان العلاجي الطبي</th>
+                                    <th style="width:70px; text-align:center;">الكمية</th>
+                                    <th style="width:120px; text-align:left;">السعر المفرد</th>
+                                    <th style="width:120px; text-align:left;">الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody id="print-inv-items">
+                                <!-- Dynamic elements -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Calculations breakdown -->
+                        <div class="preview-totals">
+                            <div class="total-row"><span>المبلغ الفرعي:</span><span id="print-inv-subtotal">0 د.ع</span></div>
+                            <div class="total-row"><span>الخصومات الممنوحة للمريض:</span><span id="print-inv-discount" style="color:red;">0 د.ع</span></div>
+                            <div class="total-row"><span>الضريبة المضافة:</span><span id="print-inv-tax">0 د.ع</span></div>
+                            <hr class="preview-mini-divider">
+                            <div class="total-row grand-total"><span>الصافي المطلوب:</span><span id="print-inv-grandtotal">0 د.ع</span></div>
+                            <hr class="preview-mini-divider">
+                            <div class="total-row payment-status">
+                                <div>الواصل نقداً: <strong id="print-inv-paid" class="text-emerald">0 د.ع</strong></div>
+                                <div style="margin-right:15px;">المتبقي بذمة المراجع: <strong id="print-inv-debt" style="color:red;">0 د.ع</strong></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Doctor stamp signature area -->
+                        <div class="preview-signature-area mt-4">
+                            <div class="sig-block">
+                                <p>الختم الرسمي للعيادة</p>
+                                <div class="stamp-box-dashed"></div>
+                            </div>
+                            <div class="sig-block">
+                                <p>توقيع الحسابات والمشرف</p>
+                                <div class="sig-line">________________</div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-footer">
+                            <p>صُدرت بواسطة منصة سُبل لإدارة عيادات ومراكز الأسنان المتكاملة © 2026</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="printInvoiceDocument()"><i class="fa-solid fa-print"></i> طباعة الفاتورة الفورية</button>
+                <button class="btn btn-primary" onclick="submitCreateInvoice()"><i class="fa-solid fa-save"></i> حفظ وترحيل القيود المالية</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.5 ADD/EDIT EXPENSE MODAL -->
+    <div class="modal-overlay hidden" id="addExpenseModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="expenseModalTitle">تسجيل مصروف مالي تشغيلي</h3>
+                <button class="close-btn" onclick="closeModal('addExpenseModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editExpenseId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newExpTitle">عنوان المصروف (البيان):</label>
+                    <input type="text" id="newExpTitle" placeholder="مثال: إيجار العيادة، شراء شاشات...">
+                </div>
+                <div class="form-group">
+                    <label for="newExpCategory">فئة المصروف:</label>
+                    <select id="newExpCategory">
+                        <option value="الخدمات العامة">خدمات عامة (إيجار، كهرباء، ماء)</option>
+                        <option value="الرواتب والكادر">رواتب وأجور الكادر</option>
+                        <option value="المخزن والمستلزمات">شراء مستلزمات طبية وأدوية</option>
+                        <option value="الصيانة والتطوير">صيانة أجهزة وتجهيز عيادات</option>
+                        <option value="تسويق ودعاية">تسويق وإعلان</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newExpAmount">مبلغ المصروف (د.ع):</label>
+                    <input type="number" id="newExpAmount" placeholder="أدخل القيمة بالدينار العراقي...">
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addExpenseModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddExpense()">تسجيل وترحيل المصروف</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.6 ADD/EDIT INVENTORY MATERIAL MODAL -->
+    <div class="modal-overlay hidden" id="addMaterialModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="materialModalTitle">إضافة مادة طبية للمخزن</h3>
+                <button class="close-btn" onclick="closeModal('addMaterialModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editMaterialId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newMatName">اسم المادة / الدواء:</label>
+                    <input type="text" id="newMatName" placeholder="مثال: Lidocaine 2% w/ Epinephrine...">
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="newMatQty">الكمية المدخلة:</label>
+                        <input type="number" id="newMatQty" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="newMatMin">الحد الأدنى للتنبيه:</label>
+                        <input type="number" id="newMatMin" value="5">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="newMatSupplier">الشركة الموردة:</label>
+                        <input type="text" id="newMatSupplier" placeholder="مثال: مذخر الرافدين للأدوية...">
+                    </div>
+                    <div class="form-group">
+                        <label for="newMatExpiry">تاريخ انتهاء الصلاحية:</label>
+                        <input type="date" id="newMatExpiry">
+                    </div>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addMaterialModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddMaterial()">حفظ وتحديث المخزون</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.7 REGISTER/EDIT EQUIPMENT MODAL -->
+    <div class="modal-overlay hidden" id="addEquipmentModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="equipmentModalTitle">تسجيل جهاز طبي جديد</h3>
+                <button class="close-btn" onclick="closeModal('addEquipmentModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editEquipmentId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newEqName">اسم الجهاز / الوحدة الطبية:</label>
+                    <input type="text" id="newEqName" placeholder="مثال: Dental Unit Sirona Z100...">
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="newEqPurchase">تاريخ الشراء:</label>
+                        <input type="date" id="newEqPurchase">
+                    </div>
+                    <div class="form-group">
+                        <label for="newEqWarranty">تاريخ انتهاء الضمان الكلي:</label>
+                        <input type="date" id="newEqWarranty">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newEqStatus">الحالة التشغيلية الأولية:</label>
+                    <select id="newEqStatus">
+                        <option value="OPERATIONAL">يعمل بكفاءة ممتازة</option>
+                        <option value="UNDER_MAINTENANCE">خاضع للصيانة الدورية</option>
+                        <option value="OUT_OF_SERVICE">متوقف عن العمل تماماً</option>
+                    </select>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addEquipmentModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddEquipment()">تسجيل وحفظ الجهاز</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.8 HIRE/EDIT EMPLOYEE MODAL -->
+    <div class="modal-overlay hidden" id="addEmployeeModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="employeeModalTitle">تعيين وإضافة كادر وظيفي جديد</h3>
+                <button class="close-btn" onclick="closeModal('addEmployeeModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editEmployeeId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newEmpName">الاسم الكامل للموظف:</label>
+                    <input type="text" id="newEmpName" placeholder="أدخل الاسم الثلاثي...">
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="newEmpRole">الدور الصلاحيات:</label>
+                        <select id="newEmpRole">
+                            <option value="DOCTOR">طبيب أسنان مختص (Doctor)</option>
+                            <option value="RECEPTION">موظف استقبال (Reception)</option>
+                            <option value="ACCOUNTANT">محاسب مالي (Accountant)</option>
+                            <option value="ASSISTANT">مساعد طبي بالعيادة (Assistant)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmpPhone">رقم هاتف الموظف:</label>
+                        <input type="text" id="newEmpPhone" placeholder="07xxxxxxxxx">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="newEmpSalary">الراتب الشهري الأساسي (د.ع):</label>
+                        <input type="number" id="newEmpSalary" value="500000">
+                    </div>
+                    <div class="form-group">
+                        <label for="newEmpHireDate">تاريخ المباشرة بالعمل:</label>
+                        <input type="date" id="newEmpHireDate">
+                    </div>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addEmployeeModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddEmployee()">تأكيد وحفظ الموظف</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.9 ADD/EDIT SUBSCRIBER CLINIC MODAL -->
+    <div class="modal-overlay hidden" id="addClinicModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="clinicModalTitle">إضافة عيادة أو مركز أسنان جديد للمنصة</h3>
+                <button class="close-btn" onclick="closeModal('addClinicModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editClinicId" value="">
+            <div class="modal-body">
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicName">اسم العيادة (بالعربية):</label>
+                        <input type="text" id="newClinicName" placeholder="مركز دجلة التخصصي لطب الأسنان...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicNameEn">اسم العيادة (بالإنجليزية):</label>
+                        <input type="text" id="newClinicNameEn" placeholder="DEJLAH DENTAL CLINIC...">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicOwner">اسم مدير العيادة المسؤول:</label>
+                        <input type="text" id="newClinicOwner" placeholder="اسم مدير العيادة المسؤول...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicPhone">رقم هاتف العيادة:</label>
+                        <input type="text" id="newClinicPhone" placeholder="مثال: 07855906001...">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicPlan">خطة الاشتراك المفعلة:</label>
+                        <select id="newClinicPlan" onchange="handleClinicPlanChange()">
+                            <option value="monthly">اشتراك شهري (1 شهر)</option>
+                            <option value="yearly">اشتراك سنوي (12 شهر)</option>
+                            <option value="custom">اشتراك مخصص (تحديد يدوي)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicPrice">سعر الاشتراك (د.ع):</label>
+                        <input type="number" id="newClinicPrice" placeholder="مثال: 150000...">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicStartDate">تاريخ البدء ووقت التفعيل:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="newClinicStartDate" style="flex: 2;">
+                            <input type="time" id="newClinicStartTime" style="flex: 1;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicEndDate">تاريخ الانتهاء ووقت القفل:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="date" id="newClinicEndDate" style="flex: 2;">
+                            <input type="time" id="newClinicEndTime" style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicUsername">اسم مستخدم الحساب الرئيسي:</label>
+                        <input type="text" id="newClinicUsername" placeholder="اسم المستخدم لتسجيل الدخول...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicPassword">كلمة السر للحساب الرئيسي:</label>
+                        <input type="text" id="newClinicPassword" placeholder="كلمة المرور الخاصة بالحساب...">
+                    </div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicUserRole">نوع الحساب الرئيسي للمشترك:</label>
+                        <select id="newClinicUserRole">
+                            <option value="OWNER">مدير عيادة</option>
+                            <option value="ADMIN">مشرف عيادة</option>
+                            <option value="STAFF">موظف عادي</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="newClinicAddress">عنوان العيادة الجغرافي:</label>
+                        <input type="text" id="newClinicAddress" placeholder="المحافظة، المنطقة، الشارع...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newClinicPhoto">صورة المدير المسؤول الشخصية:</label>
+                    <input type="file" id="newClinicPhoto" accept="image/*" onchange="readClinicPhotoFile(this)">
+                </div>
+                <div class="form-group">
+                    <label style="margin-bottom: 8px; display: block; font-weight: 700; color: #a7f3d0; font-size: 13px;">تحديد ميزات وصلاحيات العيادة للمشترك (خاص بمالك المنصة):</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(30, 41, 59, 0.25); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <!-- 1. Dashboard -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">1. لوحة التحكم والإحصائيات</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featDashboard" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 2. Patients -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">2. إدارة ملفات المرضى</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featPatients" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 3. Medical File -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">3. الملف الطبي للمراجع</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featMedicalFile" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 4. Appointments -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">4. المواعيد والتقويم</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featAppointments" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 5. Dental Chart -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">5. مخطط الأسنان التفاعلي</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featDentalChart" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 6. Billing -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">6. الحسابات والأقساط</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featBilling" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 7. Audit -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">7. جرد الحسابات والمالية</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featAudit" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 8. Inventory -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">8. المخزن والأجهزة</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featInventory" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 9. Staff -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">9. الموظفون والصلاحيات</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featStaff" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 10. Settings -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">10. الإعدادات العامة</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featSettings" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 11. Subscriber Clinics -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">11. عيادات المشتركين</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featClinics">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 12. Database Manager -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">12. مدير قواعد البيانات</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featDb">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 13. Platform Accounts -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">13. حسابات المنصة والصلاحيات</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featPlatformAccounts">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 14. Support -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">14. الحساب والدعم الفني</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featSupport" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 15. Profile -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">15. الملف الشخصي للمستخدم</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featProfile" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <!-- 16. System Info -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <span style="font-size: 12.5px; color: #cbd5e1; font-weight: bold;">16. معلومات النظام</span>
+                            <label class="switch-control">
+                                <input type="checkbox" id="featSystemInfo" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addClinicModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddClinic()">إنشاء وتفعيل العيادة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.10 ADD/EDIT EDUCATIONAL ATLAS CARD MODAL -->
+    <div class="modal-overlay hidden" id="addAtlasCardModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="atlasModalTitle">إضافة كارت / مرجع تعليمي جديد</h3>
+                <button class="close-btn" onclick="closeModal('addAtlasCardModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editAtlasCardId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="atlasCardTitle">عنوان الكارت التعليمي:</label>
+                    <input type="text" id="atlasCardTitle" placeholder="مثال: التركيبات السنية وتيجان وجسور الأسنان...">
+                </div>
+                <div class="form-group">
+                    <label for="atlasCardCategory">التصنيف (الوسم):</label>
+                    <input type="text" id="atlasCardCategory" placeholder="مثال: تركيبات وتجميل، تقويم الأسنان...">
+                </div>
+                <div class="form-group">
+                    <label for="atlasCardDesc">شرح وتفاصيل دليل المريض:</label>
+                    <textarea id="atlasCardDesc" rows="4" placeholder="اكتب الشرح الطبي المبسط هنا..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="atlasCardImageSelect">اختر الصورة المعتمدة:</label>
+                    <select id="atlasCardImageSelect" onchange="if(this.value==='custom'){document.getElementById('atlasCardCustomImageGroup').style.display='block'}else{document.getElementById('atlasCardCustomImageGroup').style.display='none'}">
+                        <option value="assets/prosthodontics_bridge.jpg">التركيبات السنية وتيجان وجسور الأسنان</option>
+                        <option value="assets/treatments.jpg">علاج وحشوة العصب والترميم التجميلي</option>
+                        <option value="assets/tooth_conditions.jpg">حالة السن وبنيته (تسوس، سليم، ملتهب)</option>
+                        <option value="assets/roots_canals_anatomy.jpg">تشريح جذور وقنوات الأسنان</option>
+                        <option value="assets/ortho_braces.jpg">تقويم الأسنان وحالاته</option>
+                        <option value="assets/smiles.jpg">عدسات الأسنان التجميلية والابتسامات</option>
+                        <option value="assets/extraction.jpg">قلع الأسنان البسيط والجراحي</option>
+                        <option value="assets/implant.jpg">زراعة الأسنان وتثبيت الغرسات</option>
+                        <option value="custom">-- حدد صورة مخصصة (رابط أو رفع ملف) --</option>
+                    </select>
+                </div>
+                <div class="form-group" id="atlasCardCustomImageGroup" style="display: none; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px dashed var(--border-color); margin-top: 10px;">
+                    <div style="margin-bottom: 10px;">
+                        <label for="atlasCardCustomImage">رابط الصورة المباشر (URL):</label>
+                        <input type="text" id="atlasCardCustomImage" placeholder="مثال: https://...">
+                    </div>
+                    <div>
+                        <label for="atlasCardCustomImageFile">أو اختر ملف صورة من جهازك:</label>
+                        <input type="file" id="atlasCardCustomImageFile" accept="image/*" onchange="readAtlasImageFile(this)" style="background:transparent; border:none; padding:0; color:#fff;">
+                    </div>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addAtlasCardModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddAtlasCard()">حفظ الكارت التعليمي</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.11 ADD/EDIT PRESCRIPTION MODAL -->
+    <div class="modal-overlay hidden" id="addPrescriptionModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3 id="prescriptionModalTitle">إصدار وصفة طبية جديدة</h3>
+                <button class="close-btn" onclick="closeModal('addPrescriptionModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <input type="hidden" id="editPrescriptionId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="prescInputText">الوصفة والعلاج الطبي:</label>
+                    <textarea id="prescInputText" rows="4" placeholder="اكتب أسماء الأدوية والجرعة الموصى بها (مثال: Amoxicillin 500mg - كل 8 ساعات)..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="prescInputDoctor">الطبيب الموصي:</label>
+                    <select id="prescInputDoctor">
+                        <!-- Loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addPrescriptionModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddPrescription()">إصدار وحفظ الوصفة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.12 ADD CLINICAL SESSION MODAL (تسجيل جلسة علاجية) -->
+    <div class="modal-overlay hidden" id="addTreatmentSessionModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3>(+ تسجيل جلسة علاجية جديدة للمراجع)</h3>
+                <button class="close-btn" onclick="closeModal('addTreatmentSessionModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-body">
+                <div class="patient-financial-summary-badge" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #cbd5e1;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                        <span>إجمالي تكلفة العلاج المسجلة سابقاً:</span>
+                        <strong id="session-prev-total">0 د.ع</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                        <span>إجمالي المقبوضات المدفوعة سابقاً:</span>
+                        <strong id="session-prev-paid" style="color:var(--accent-emerald);">0 د.ع</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>المتبقي عليه بذمته (دين):</span>
+                        <strong id="session-prev-debt" style="color:var(--accent-red);">0 د.ع</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sessionDate">تاريخ الجلسة:</label>
+                    <input type="date" id="sessionDate">
+                </div>
+                <div class="form-group">
+                    <label for="sessionProcedure">الإجراء العلاجي المنفذ:</label>
+                    <input type="text" id="sessionProcedure" placeholder="مثال: حشوة جذر سن 14، تنظيف لثة...">
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="sessionCost">التكلفة الكلية للجلسة (د.ع):</label>
+                        <input type="number" id="sessionCost" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="sessionPaid">المدفوع نقداً بالجلسة (د.ع):</label>
+                        <input type="number" id="sessionPaid" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sessionNotes">ملاحظات الطبيب المعالج:</label>
+                    <textarea id="sessionNotes" rows="3" placeholder="اكتب الملاحظات الطبية..."></textarea>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-top: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #cbd5e1;">
+                        <input type="checkbox" id="sessionHasNext" style="width:16px; height:16px; cursor:pointer;" onchange="document.getElementById('sessionNextDetailsGrid').style.display = this.checked ? 'grid' : 'none'">
+                        هل تم تحديد موعد لجلسة قادمة (جلسة ثانية)؟
+                    </label>
+                    <div id="sessionNextDetailsGrid" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <div class="form-group">
+                            <label for="sessionNextDate">تاريخ الجلسة القادمة:</label>
+                            <input type="date" id="sessionNextDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionNextTime">التوقيت (كتابة):</label>
+                            <input type="text" id="sessionNextTime" placeholder="مثال: 05:00 م...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addTreatmentSessionModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddTreatmentSession()">تسجيل وحفظ الجلسة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.13 RECORD CASH PAYMENT MODAL (تسجيل دفعة نقدية واصل) -->
+    <div class="modal-overlay hidden" id="addPaymentModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3>(+ تسجيل دفعة نقدية واصل للمريض)</h3>
+                <button class="close-btn" onclick="closeModal('addPaymentModal')">&times;</button>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-body">
+                <div class="patient-financial-summary-badge" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #cbd5e1;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                        <span>إجمالي تكلفة العلاج المسجلة سابقاً:</span>
+                        <strong id="payment-prev-total">0 د.ع</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                        <span>إجمالي المقبوضات المدفوعة سابقاً:</span>
+                        <strong id="payment-prev-paid" style="color:var(--accent-emerald);">0 د.ع</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>المتبقي عليه بذمته (دين):</span>
+                        <strong id="payment-prev-debt" style="color:var(--accent-red);">0 د.ع</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentDate">تاريخ الدفع:</label>
+                    <input type="date" id="paymentDate">
+                </div>
+                <div class="form-group">
+                    <label for="paymentAmount">قيمة الدفعة النقدية المستلمة (د.ع):</label>
+                    <input type="number" id="paymentAmount" value="50000">
+                </div>
+                <div class="form-group">
+                    <label for="paymentNotes">ملاحظات المقبوضات:</label>
+                    <input type="text" id="paymentNotes" placeholder="مثال: قسط شهري، دفعة مقدمة..." value="دفعة نقدية واصل">
+                </div>
+            </div>
+            <hr class="form-divider">
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addPaymentModal')">إلغاء</button>
+                <button class="btn btn-primary" onclick="submitAddPayment()">تأكيد واستلام الدفعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- subscription lock screen overlay -->
+    <div class="modal-overlay hidden" id="subscriptionExpiredOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 4, 8, 0.97); z-index: 999999; display: flex; align-items: center; justify-content: center; font-family: 'Cairo';">
+        <div class="modal-card glass-card" style="max-width: 480px; text-align: center; border: 1px solid #ef4444; box-shadow: 0 0 30px rgba(239, 68, 68, 0.2); padding: 30px; border-radius: 12px; background: rgba(13, 15, 25, 0.85); backdrop-filter: blur(10px);">
+            <div style="font-size: 55px; color: #ef4444; margin-bottom: 20px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 12px; color: #fff;">عذراً، ليس لديك صلاحيات للوصول</h2>
+            <p style="font-size: 13px; color: #9ca3af; line-height: 1.7; margin-bottom: 25px;">
+                لقد انتهت صلاحية اشتراك عيادتكم التراخيصية في منصة سُبل لإدارة عيادات ومراكز الأسنان.<br>
+                يرجى التواصل مع إدارة منصة سبل لتسوية وتجديد الاشتراك لمواصلة التحكم وإدارة عيادتكم.
+            </p>
+            <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); text-align: right; font-size: 12.5px; color: #cbd5e1; margin-bottom: 25px;">
+                <div style="margin-bottom: 4px;"><strong>رقم الترخيص:</strong> <span id="lockClinicCode">-</span></div>
+                <div style="margin-bottom: 4px;"><strong>تاريخ الانتهاء:</strong> <span id="lockClinicEndDate" style="color:#ef4444;">-</span></div>
+                <div><strong>صاحب الترخيص:</strong> <span id="lockClinicOwner">-</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn btn-primary" onclick="contactSupportForSubscription()" style="background: #10b981; border-color: #10b981;">
+                    <i class="fa-solid fa-phone" style="margin-left: 8px;"></i> تواصل مع الدعم الفني لتجديد الاشتراك
+                </button>
+                <button class="btn btn-secondary" onclick="handleLogout()" style="background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.1);">
+                    <i class="fa-solid fa-right-from-bracket" style="margin-left: 8px;"></i> تسجيل الخروج والعودة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print area wrappers (hidden visually, visible during print) -->
+    <div id="printWrapper" class="print-only"></div>
+
+    <!-- Core Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
